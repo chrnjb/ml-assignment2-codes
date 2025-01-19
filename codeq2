@@ -1,0 +1,11 @@
+import matplotlib.pyplot as plt
+
+# Plot cost function vs. iterations for the first 50 iterations
+plt.figure(figsize=(8, 6))
+plt.plot(range(1, 51), cost_history[:50], marker='o', color='b', label='Cost Function')
+plt.title("Cost Function vs. Iterations (First 50 Iterations)", fontsize=14)
+plt.xlabel("Iteration", fontsize=12)
+plt.ylabel("Cost Function Value", fontsize=12)
+plt.grid(True)
+plt.legend(fontsize=12)
+plt.show()
