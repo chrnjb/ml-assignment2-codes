@@ -1,0 +1,51 @@
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
+
+# Add new independent variables (squares of original variables)
+logisticX_extended = np.hstack((
+    logisticX,
+    logisticX[:, 0:1]**2,  # Square of the first variable
+    logisticX[:, 1:2]**2   # Square of the second variable
+))
+
+# Train logistic regression on the extended dataset
+model_extended = LogisticRegression(solver='lbfgs', max_iter=1000)
+model_extended.fit(logisticX_extended, logisticY)
+
+# Extract coefficients and intercept for the extended model
+coefficients_extended = model_extended.coef_[0]
+intercept_extended = model_extended.intercept_[0]
+
+# Plot data points and decision boundary
+plt.figure(figsize=(10, 6))
+plt.scatter(logisticX[logisticY == 0][:, 0], logisticX[logisticY == 0][:, 1], color='blue', label='Class 0')
+plt.scatter(logisticX[logisticY == 1][:, 0], logisticX[logisticY == 1][:, 1], color='red', label='Class 1')
+
+# Generate grid for decision boundary in the feature space
+x1_range = np.linspace(logisticX[:, 0].min(), logisticX[:, 0].max(), 100)
+x2_range = np.linspace(logisticX[:, 1].min(), logisticX[:, 1].max(), 100)
+x1_grid, x2_grid = np.meshgrid(x1_range, x2_range)
+x1x2_grid = np.c_[x1_grid.ravel(), x2_grid.ravel()]
+x1x2x1_sq_x2_sq = np.hstack((x1x2_grid, x1x2_grid[:, 0:1]**2, x1x2_grid[:, 1:2]**2))
+decision_values = model_extended.decision_function(x1x2x1_sq_x2_sq)
+decision_boundary = decision_values.reshape(x1_grid.shape)
+
+# Plot decision boundary
+plt.contour(x1_grid, x2_grid, decision_boundary, levels=[0], linewidths=2, colors='green')
+plt.title('Logistic Regression with Extended Dataset (Squared Features)')
+plt.xlabel('Feature 1')
+plt.ylabel('Feature 2')
+plt.legend()
+plt.grid()
+plt.show()
+
+# Confusion Matrix
+predictions_extended = model_extended.predict(logisticX_extended)
+conf_matrix = confusion_matrix(logisticY, predictions_extended)
+
+# Calculate metrics
+accuracy = accuracy_score(logisticY, predictions_extended)
+precision = precision_score(logisticY, predictions_extended)
+recall = recall_score(logisticY, predictions_extended)
+f1 = f1_score(logisticY, predictions_extended)
+
+coefficients_extended, intercept_extended, conf_matrix, accuracy, precision, recall, f1
